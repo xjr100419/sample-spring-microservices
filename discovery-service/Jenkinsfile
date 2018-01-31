@@ -7,9 +7,9 @@ node {
         stage('Build') {
             mvnHome = tool 'M3'
              sh "'${mvnHome}/bin/mvn'  clean install"
-            def pom = readMavenPom file:'pom.xml'
-            print pom.version
-            env.version = pom.version
+
+            print ${POM_VERSION}
+            env.version = ${POM_VERSION}
 
         }
 
