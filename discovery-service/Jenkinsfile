@@ -4,11 +4,14 @@ node {
         }
 
         stage('Build') {
-            sh 'mvn clean install'
+            withMaven(
+                maven: 'M3') {
+                    sh 'mvn clean install'
+                    def pom = readMavenPom file:'pom.xml'
+                    print pom.version
+                    env.version = pom.version
+            }
 
-            def pom = readMavenPom file:'pom.xml'
-            print pom.version
-            env.version = pom.version
         }
 
         stage('Image') {
