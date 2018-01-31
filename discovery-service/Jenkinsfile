@@ -8,8 +8,8 @@ node {
             mvnHome = tool 'M3'
              sh "'${mvnHome}/bin/mvn'  clean install"
 
-            print ${POM_VERSION}
-            env.version = ${POM_VERSION}
+            print ‘${POM_VERSION}’
+            env.version = ‘${POM_VERSION}’
 
         }
 
