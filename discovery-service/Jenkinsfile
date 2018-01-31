@@ -1,16 +1,15 @@
 node {
+        def mvnHome
         stage('Checkout') {
             git url: 'https://github.com/piomin/sample-spring-microservices.git', credentialsId: 'github-piomin', branch: 'master'
         }
 
         stage('Build') {
-            withMaven(
-                maven: 'M3') {
-                    sh 'mvn clean install'
-                    def pom = readMavenPom file:'pom.xml'
-                    print pom.version
-                    env.version = pom.version
-            }
+            mvnHome = tool 'M3'
+             sh "'${mvnHome}/bin/mvn'  clean install"
+            def pom = readMavenPom file:'pom.xml'
+            print pom.version
+            env.version = pom.version
 
         }
 
@@ -28,4 +27,29 @@ node {
         stage ('Final') {
             build job: 'account-service-pipeline', wait: false
         }      
+}
+
+
+node {
+   def mvnHome
+   stage('Preparation') { // for display purposes
+      // Get some code from a GitHub repository
+      git 'https://github.com/jglick/simple-maven-project-with-tests.git'
+      // Get the Maven tool.
+      // ** NOTE: This 'M3' Maven tool must be configured
+      // **       in the global configuration.
+      mvnHome = tool 'M3'
+   }
+   stage('Build') {
+      // Run the maven build
+      if (isUnix()) {
+         sh "'${mvnHome}/bin/mvn' -Dmaven.test.failure.ignore clean package"
+      } else {
+         bat(/"${mvnHome}\bin\mvn" -Dmaven.test.failure.ignore clean package/)
+      }
+   }
+   stage('Results') {
+      junit '**/target/surefire-reports/TEST-*.xml'
+      archive 'target/*.jar'
+   }
 }
