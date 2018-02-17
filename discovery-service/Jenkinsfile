@@ -16,6 +16,7 @@ node {
 
         stage('Image') {
             dir ('discovery-service') {
+                sh "docker login 192.168.80.180:5000 -u admin -p 123456"
                 def app = docker.build "192.168.80.180:5000/demo/discovery-service:${env.version}"
                 app.push()
             }
